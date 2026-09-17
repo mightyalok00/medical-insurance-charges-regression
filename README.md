@@ -61,7 +61,6 @@ medical-insurance-charges-regression/
 │   └── project_report.pdf
 ├── images/
 ├── docs/
-│   └── Insurance_Regression_Project_Questions.docx
 ├── app.py
 ├── README.md
 ├── requirements.txt
@@ -75,15 +74,32 @@ The notebook contains **23 executable code cells**, each beginning with a short 
 
 ## Streamlit Dashboard
 
-The root-level `app.py` provides an interactive portfolio dashboard with:
+The root-level `app.py` provides a professional interactive portfolio dashboard with:
 
-- insurance-charge prediction using the tuned Decision Tree pipeline
+- side-by-side predictions from all three trained regression pipelines
+- executive overview and model-performance summary
 - age, sex, BMI, children, smoking-status, and region inputs
 - model-comparison metrics and charts
 - business insights and feature-importance output
 - predicted-cost segmentation and cleaned-data preview
+- emoji-based dataset filters and CSV download
+- access to saved project reports and diagnostics
 
 The prediction dashboard is for **educational/portfolio use only** and is not intended for real insurance pricing or eligibility decisions.
+
+## Professional Documentation
+
+The `docs/` directory now includes focused documentation for:
+
+- model card and model-selection rationale
+- data dictionary and project structure
+- leakage prevention, validation, and reproducibility
+- evaluation metrics and business insights
+- fairness, limitations, and security considerations
+- Streamlit usage, deployment, testing, and troubleshooting
+- contributing guidance, roadmap, FAQ, and development history
+
+See `docs/DEVELOPMENT_LOG.md` for the documented project milestones.
 
 ## Run Locally
 
