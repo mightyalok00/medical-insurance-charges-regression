@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from typing import Dict
+import math
 
 import altair as alt
 import joblib
@@ -43,7 +44,6 @@ st.markdown(
       .hero h1 {margin: 0 0 .35rem 0; font-size: 2rem;}
       .hero p {margin: 0; opacity: .82;}
       .best-model {padding: .95rem 1rem; border: 1px solid rgba(16,185,129,.30); background: rgba(16,185,129,.07); border-radius: 12px; margin: .6rem 0 1rem 0;}
-      .note {padding: .8rem 1rem; border-left: 4px solid #2563EB; background: rgba(37,99,235,.05); border-radius: 8px;}
     </style>
     """,
     unsafe_allow_html=True,
@@ -101,11 +101,8 @@ def load_assets():
     if not DATA_PATH.exists():
         st.error(f"Required dataset not found: {DATA_PATH}")
         st.stop()
-    try:
-        data = clean_columns(pd.read_csv(DATA_PATH))
-    except Exception as exc:
-        st.error(f"Could not load cleaned dataset: {exc}")
-        st.stop()
+
+    data = clean_columns(pd.read_csv(DATA_PATH))
     comparison = read_csv_if_exists(COMPARISON_PATH)
     diagnostics = read_csv_if_exists(DIAGNOSTICS_PATH)
     cv_results = read_csv_if_exists(CV_PATH)
@@ -183,6 +180,9 @@ available_models = [name for name in MODEL_PATHS if name in models]
 
 age_min, age_max = int(data.age.min()), int(data.age.max())
 bmi_min, bmi_max = float(data.bmi.min()), float(data.bmi.max())
+# Expand BMI slider bounds outward to the nearest 0.1 so default filters include every row.
+bmi_slider_min = math.floor(bmi_min * 10) / 10
+bmi_slider_max = math.ceil(bmi_max * 10) / 10
 children_min, children_max = int(data.children.min()), int(data.children.max())
 sex_options = sorted(data.sex.dropna().astype(str).unique().tolist())
 smoker_options = sorted(data.smoker.dropna().astype(str).unique().tolist())
@@ -201,7 +201,7 @@ selected_model = st.sidebar.selectbox(
     options=selector_options,
     index=0,
     key="global_model_selector",
-    help="This selector controls the Prediction Lab below.",
+    help="This selector controls the Prediction Lab.",
 )
 
 if available_models:
@@ -217,8 +217,12 @@ if model_errors:
 st.sidebar.markdown("### 🎛️ Dataset filters")
 age_filter = st.sidebar.slider("🎂 Age", age_min, age_max, (age_min, age_max), key="age_filter")
 bmi_filter = st.sidebar.slider(
-    "⚖️ BMI", round(bmi_min, 1), round(bmi_max, 1),
-    (round(bmi_min, 1), round(bmi_max, 1)), step=.1, key="bmi_filter"
+    "⚖️ BMI",
+    min_value=bmi_slider_min,
+    max_value=bmi_slider_max,
+    value=(bmi_slider_min, bmi_slider_max),
+    step=.1,
+    key="bmi_filter",
 )
 children_filter = st.sidebar.slider(
     "👶 Children", children_min, children_max, (children_min, children_max), key="children_filter"
@@ -256,6 +260,11 @@ head[1].metric("Models loaded", f"{len(available_models)}/3")
 head[2].metric("Best test model", best_model_name.replace(" Regression", ""))
 head[3].metric("Median charge", format_currency(median_charge))
 head[4].metric("Filtered rows", f"{len(filtered_data):,}")
+
+if len(filtered_data) == len(data):
+    st.caption("All dataset rows are currently included in the sidebar filters.")
+else:
+    st.caption(f"{len(data) - len(filtered_data):,} row(s) are currently excluded by the sidebar filters.")
 
 st.caption("Educational portfolio project only — not for real insurance pricing, underwriting, eligibility, or adverse-action decisions.")
 
@@ -306,7 +315,14 @@ with prediction_tab:
         age = st.slider("Age", age_min, age_max, int(data.age.median()), key="pred_age")
         sex = st.selectbox("Sex", sex_options, key="pred_sex")
     with c2:
-        bmi = st.slider("BMI", round(bmi_min,1), round(bmi_max,1), round(float(data.bmi.median()),1), step=.1, key="pred_bmi")
+        bmi = st.slider(
+            "BMI",
+            min_value=bmi_slider_min,
+            max_value=bmi_slider_max,
+            value=round(float(data.bmi.median()), 1),
+            step=.1,
+            key="pred_bmi",
+        )
         children = st.slider("Children", children_min, children_max, int(data.children.median()), key="pred_children")
     with c3:
         smoker = st.selectbox("Smoker", smoker_options, key="pred_smoker")
