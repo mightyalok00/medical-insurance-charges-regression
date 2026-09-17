@@ -5,3 +5,4 @@ scikit-learn>=1.4
 jupyter>=1.0
 joblib>=1.3
 streamlit>=1.38
+altair>=5.0
