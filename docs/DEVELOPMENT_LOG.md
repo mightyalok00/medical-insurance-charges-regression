@@ -28,3 +28,6 @@ Documented tuned Decision Tree Regression with depth, split, and leaf controls.
 
 ## 09 — Cross-validation
 Recorded 5-fold cross-validation for model selection without using the final test set.
+
+## 10 — Metric framework
+Documented MAE, MSE, RMSE, and R² as the common evaluation framework for all models.
