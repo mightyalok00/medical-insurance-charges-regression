@@ -19,3 +19,6 @@ Recorded the train/test split strategy and pipeline-based preprocessing used to 
 
 ## 06 — Linear baseline
 Documented the Multiple Linear Regression baseline and its evaluation metrics.
+
+## 07 — Polynomial modeling
+Recorded validation-based selection of polynomial degree for nonlinear relationships.
