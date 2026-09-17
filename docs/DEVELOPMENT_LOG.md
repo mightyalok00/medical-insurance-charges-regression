@@ -22,3 +22,6 @@ Documented the Multiple Linear Regression baseline and its evaluation metrics.
 
 ## 07 — Polynomial modeling
 Recorded validation-based selection of polynomial degree for nonlinear relationships.
+
+## 08 — Decision Tree modeling
+Documented tuned Decision Tree Regression with depth, split, and leaf controls.
