@@ -16,3 +16,6 @@ Documented age, BMI, children, smoking status, and charge relationships explored
 
 ## 05 — Leakage prevention
 Recorded the train/test split strategy and pipeline-based preprocessing used to protect the final test set.
+
+## 06 — Linear baseline
+Documented the Multiple Linear Regression baseline and its evaluation metrics.
