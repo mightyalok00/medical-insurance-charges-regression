@@ -8,10 +8,6 @@ import joblib
 import pandas as pd
 import streamlit as st
 
-
-# -----------------------------------------------------------------------------
-# Project configuration
-# -----------------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent
 DATA_PATH = BASE_DIR / "data" / "processed" / "insurance_cleaned.csv"
 REPORTS_DIR = BASE_DIR / "reports"
@@ -31,10 +27,6 @@ FEATURE_IMPORTANCE_PATH = REPORTS_DIR / "decision_tree_feature_importance.csv"
 REPORT_MD_PATH = REPORTS_DIR / "project_report.md"
 REPORT_PDF_PATH = REPORTS_DIR / "project_report.pdf"
 
-
-# -----------------------------------------------------------------------------
-# Page configuration
-# -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="Medical Insurance ML Dashboard",
     page_icon="🏥",
@@ -45,54 +37,23 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-        .block-container {
-            max-width: 1450px;
-            padding-top: 1.5rem;
-            padding-bottom: 3rem;
-        }
-        [data-testid="stMetric"] {
-            background: rgba(120, 120, 120, 0.06);
-            border: 1px solid rgba(120, 120, 120, 0.18);
-            border-radius: 14px;
-            padding: 0.9rem;
-        }
-        .hero {
-            padding: 1.35rem 1.45rem;
-            border: 1px solid rgba(120, 120, 120, 0.20);
-            border-radius: 18px;
-            background: linear-gradient(135deg, rgba(31,119,180,.11), rgba(44,160,44,.06));
-            margin-bottom: 1rem;
-        }
-        .hero h1 { margin: 0 0 0.4rem 0; font-size: 2rem; }
-        .hero p { margin: 0; opacity: 0.82; }
-        .section-note {
-            padding: 0.85rem 1rem;
-            border-left: 4px solid #4c78a8;
-            background: rgba(76,120,168,.06);
-            border-radius: 8px;
-            margin: 0.5rem 0 1rem 0;
-        }
-        .best-model {
-            padding: 1rem 1.1rem;
-            border: 1px solid rgba(46,125,50,.30);
-            background: rgba(46,125,50,.07);
-            border-radius: 12px;
-            margin: 0.5rem 0 1rem 0;
-        }
-        .small-muted { font-size: 0.9rem; opacity: 0.72; }
+      .block-container {max-width: 1450px; padding-top: 1.4rem; padding-bottom: 3rem;}
+      [data-testid="stMetric"] {background: rgba(120,120,120,.06); border: 1px solid rgba(120,120,120,.18); border-radius: 14px; padding: .85rem;}
+      .hero {padding: 1.3rem 1.45rem; border: 1px solid rgba(120,120,120,.20); border-radius: 18px; background: linear-gradient(135deg, rgba(37,99,235,.10), rgba(16,185,129,.07)); margin-bottom: 1rem;}
+      .hero h1 {margin: 0 0 .35rem 0; font-size: 2rem;}
+      .hero p {margin: 0; opacity: .82;}
+      .best-model {padding: .95rem 1rem; border: 1px solid rgba(16,185,129,.30); background: rgba(16,185,129,.07); border-radius: 12px; margin: .6rem 0 1rem 0;}
+      .note {padding: .8rem 1rem; border-left: 4px solid #2563EB; background: rgba(37,99,235,.05); border-radius: 8px;}
     </style>
     """,
     unsafe_allow_html=True,
 )
 
 
-# -----------------------------------------------------------------------------
-# Helpers
-# -----------------------------------------------------------------------------
 def clean_columns(df: pd.DataFrame) -> pd.DataFrame:
-    cleaned = df.copy()
-    cleaned.columns = [str(col).strip() for col in cleaned.columns]
-    return cleaned
+    out = df.copy()
+    out.columns = [str(c).strip() for c in out.columns]
+    return out
 
 
 def read_csv_if_exists(path: Path) -> pd.DataFrame:
@@ -107,48 +68,44 @@ def read_csv_if_exists(path: Path) -> pd.DataFrame:
 def normalize_feature_importance(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return df
-
-    cleaned = clean_columns(df)
-
-    if "Unnamed: 0" in cleaned.columns:
-        cleaned = cleaned.rename(columns={"Unnamed: 0": "Feature"})
-
+    out = clean_columns(df)
+    if "Unnamed: 0" in out.columns:
+        out = out.rename(columns={"Unnamed: 0": "Feature"})
     for alias in ["feature", "features", "Feature Name", "Feature_Name"]:
-        if "Feature" not in cleaned.columns and alias in cleaned.columns:
-            cleaned = cleaned.rename(columns={alias: "Feature"})
-
+        if "Feature" not in out.columns and alias in out.columns:
+            out = out.rename(columns={alias: "Feature"})
     for alias in ["Importance", "feature_importance", "Feature Importance", "Feature_Importance"]:
-        if "importance" not in cleaned.columns and alias in cleaned.columns:
-            cleaned = cleaned.rename(columns={alias: "importance"})
-
-    unnamed = [c for c in cleaned.columns if str(c).lower().startswith("unnamed:")]
-    return cleaned.drop(columns=unnamed, errors="ignore")
+        if "importance" not in out.columns and alias in out.columns:
+            out = out.rename(columns={alias: "importance"})
+    unnamed = [c for c in out.columns if str(c).lower().startswith("unnamed:")]
+    return out.drop(columns=unnamed, errors="ignore")
 
 
 @st.cache_resource
-def load_models() -> Dict[str, object]:
-    models = {}
-    for model_name, model_path in MODEL_PATHS.items():
-        if model_path.exists():
-            try:
-                models[model_name] = joblib.load(model_path)
-            except Exception:
-                pass
-    return models
+def load_models() -> tuple[Dict[str, object], Dict[str, str]]:
+    models: Dict[str, object] = {}
+    errors: Dict[str, str] = {}
+    for name, path in MODEL_PATHS.items():
+        if not path.exists():
+            errors[name] = f"Missing file: {path.name}"
+            continue
+        try:
+            models[name] = joblib.load(path)
+        except Exception as exc:
+            errors[name] = str(exc)
+    return models, errors
 
 
 @st.cache_data
-def load_project_assets():
+def load_assets():
     if not DATA_PATH.exists():
-        st.error(f"Required cleaned dataset was not found: {DATA_PATH}")
+        st.error(f"Required dataset not found: {DATA_PATH}")
         st.stop()
-
     try:
         data = clean_columns(pd.read_csv(DATA_PATH))
     except Exception as exc:
-        st.error(f"Could not load the cleaned dataset: {exc}")
+        st.error(f"Could not load cleaned dataset: {exc}")
         st.stop()
-
     comparison = read_csv_if_exists(COMPARISON_PATH)
     diagnostics = read_csv_if_exists(DIAGNOSTICS_PATH)
     cv_results = read_csv_if_exists(CV_PATH)
@@ -161,25 +118,20 @@ def format_currency(value: float) -> str:
     return f"${value:,.2f}"
 
 
-def get_best_model_name(comparison_df: pd.DataFrame) -> str:
-    if comparison_df.empty or "Model" not in comparison_df.columns:
-        return "Decision Tree Regression"
-    rmse_col = "Test RMSE" if "Test RMSE" in comparison_df.columns else None
-    if rmse_col is None:
-        return "Decision Tree Regression"
-    values = pd.to_numeric(comparison_df[rmse_col], errors="coerce")
-    if values.notna().any():
-        return str(comparison_df.loc[values.idxmin(), "Model"])
+def get_best_model_name(df: pd.DataFrame) -> str:
+    if not df.empty and {"Model", "Test RMSE"}.issubset(df.columns):
+        rmse = pd.to_numeric(df["Test RMSE"], errors="coerce")
+        if rmse.notna().any():
+            return str(df.loc[rmse.idxmin(), "Model"])
     return "Decision Tree Regression"
 
 
 def model_metric_chart(df: pd.DataFrame, metric: str):
-    plot_df = df[["Model", metric]].copy()
-    plot_df[metric] = pd.to_numeric(plot_df[metric], errors="coerce")
-    plot_df = plot_df.dropna()
-
+    p = df[["Model", metric]].copy()
+    p[metric] = pd.to_numeric(p[metric], errors="coerce")
+    p = p.dropna()
     return (
-        alt.Chart(plot_df)
+        alt.Chart(p)
         .mark_bar(cornerRadiusTopLeft=7, cornerRadiusTopRight=7)
         .encode(
             x=alt.X(field="Model", type="nominal", title=None, sort=None),
@@ -189,503 +141,294 @@ def model_metric_chart(df: pd.DataFrame, metric: str):
                 alt.Tooltip(field=metric, type="quantitative", title=metric, format=",.3f"),
             ],
         )
-        .properties(height=360)
+        .properties(height=350)
     )
 
 
 def feature_importance_chart(df: pd.DataFrame):
-    plot_df = df[["Feature", "importance"]].copy()
-    plot_df["importance"] = pd.to_numeric(plot_df["importance"], errors="coerce")
-    plot_df = plot_df.dropna().sort_values("importance", ascending=False).head(12)
-
+    p = df[["Feature", "importance"]].copy()
+    p["importance"] = pd.to_numeric(p["importance"], errors="coerce")
+    p = p.dropna().sort_values("importance", ascending=False).head(12)
     return (
-        alt.Chart(plot_df)
+        alt.Chart(p)
         .mark_bar(cornerRadiusEnd=5)
         .encode(
             x=alt.X(field="importance", type="quantitative", title="Feature importance"),
             y=alt.Y(field="Feature", type="nominal", title=None, sort="-x"),
             tooltip=[
-                alt.Tooltip(field="Feature", type="nominal", title="Feature"),
-                alt.Tooltip(field="importance", type="quantitative", title="Importance", format=".4f"),
+                alt.Tooltip(field="Feature", type="nominal"),
+                alt.Tooltip(field="importance", type="quantitative", format=".4f"),
             ],
         )
         .properties(height=390)
     )
 
 
-def charge_distribution_chart(df: pd.DataFrame):
-    return (
-        alt.Chart(df)
-        .mark_bar(opacity=0.82)
-        .encode(
-            x=alt.X(field="charges", type="quantitative", bin=alt.Bin(maxbins=35), title="Observed charges"),
-            y=alt.Y("count():Q", title="Records"),
-            tooltip=[alt.Tooltip("count():Q", title="Records")],
-        )
-        .properties(height=330)
-    )
+def reset_filters():
+    for key in ["age_filter", "bmi_filter", "children_filter", "sex_filter", "smoker_filter", "region_filter"]:
+        st.session_state.pop(key, None)
 
 
-def smoker_charge_chart(df: pd.DataFrame):
-    return (
-        alt.Chart(df)
-        .mark_boxplot(size=48)
-        .encode(
-            x=alt.X(field="smoker", type="nominal", title="Smoker status"),
-            y=alt.Y(field="charges", type="quantitative", title="Charges"),
-        )
-        .properties(height=330)
-    )
+models, model_errors = load_models()
+data, comparison, diagnostics, cv_results, segments, importance = load_assets()
 
-
-# -----------------------------------------------------------------------------
-# Load project assets
-# -----------------------------------------------------------------------------
-models = load_models()
-data, comparison, diagnostics, cv_results, segments, importance = load_project_assets()
-
-required_columns = {"age", "sex", "bmi", "children", "smoker", "region", "charges"}
-missing_columns = required_columns - set(data.columns)
-if missing_columns:
-    st.error("The cleaned dataset is missing required columns: " + ", ".join(sorted(missing_columns)))
+required = {"age", "sex", "bmi", "children", "smoker", "region", "charges"}
+missing = required - set(data.columns)
+if missing:
+    st.error("Cleaned dataset is missing required columns: " + ", ".join(sorted(missing)))
     st.stop()
 
 best_model_name = get_best_model_name(comparison)
+available_models = [name for name in MODEL_PATHS if name in models]
 
-age_min = int(data["age"].min())
-age_max = int(data["age"].max())
-bmi_min = float(data["bmi"].min())
-bmi_max = float(data["bmi"].max())
-children_min = int(data["children"].min())
-children_max = int(data["children"].max())
+age_min, age_max = int(data.age.min()), int(data.age.max())
+bmi_min, bmi_max = float(data.bmi.min()), float(data.bmi.max())
+children_min, children_max = int(data.children.min()), int(data.children.max())
+sex_options = sorted(data.sex.dropna().astype(str).unique().tolist())
+smoker_options = sorted(data.smoker.dropna().astype(str).unique().tolist())
+region_options = sorted(data.region.dropna().astype(str).unique().tolist())
+q1_charge = float(data.charges.quantile(.25))
+median_charge = float(data.charges.median())
+q3_charge = float(data.charges.quantile(.75))
 
-sex_options = sorted(data["sex"].dropna().astype(str).unique().tolist())
-smoker_options = sorted(data["smoker"].dropna().astype(str).unique().tolist())
-region_options = sorted(data["region"].dropna().astype(str).unique().tolist())
-
-q1_charge = float(data["charges"].quantile(0.25))
-median_charge = float(data["charges"].median())
-q3_charge = float(data["charges"].quantile(0.75))
-
-
-# -----------------------------------------------------------------------------
-# Sidebar
-# -----------------------------------------------------------------------------
 st.sidebar.markdown("## 🏥 Project Navigator")
 st.sidebar.caption("Medical Insurance Charges Regression")
 
+st.sidebar.markdown("### 🧠 Prediction model")
+selector_options = ["Compare all models"] + available_models
+selected_model = st.sidebar.selectbox(
+    "Select model",
+    options=selector_options,
+    index=0,
+    key="global_model_selector",
+    help="This selector controls the Prediction Lab below.",
+)
+
+if available_models:
+    st.sidebar.success(f"Loaded {len(available_models)}/3 model files")
+else:
+    st.sidebar.error("No trained models could be loaded")
+
+if model_errors:
+    with st.sidebar.expander("Model load diagnostics"):
+        for name, error in model_errors.items():
+            st.write(f"**{name}:** {error}")
+
 st.sidebar.markdown("### 🎛️ Dataset filters")
-age_filter = st.sidebar.slider("🎂 Age", age_min, age_max, (age_min, age_max))
+age_filter = st.sidebar.slider("🎂 Age", age_min, age_max, (age_min, age_max), key="age_filter")
 bmi_filter = st.sidebar.slider(
-    "⚖️ BMI",
-    min_value=round(bmi_min, 1),
-    max_value=round(bmi_max, 1),
-    value=(round(bmi_min, 1), round(bmi_max, 1)),
-    step=0.1,
+    "⚖️ BMI", round(bmi_min, 1), round(bmi_max, 1),
+    (round(bmi_min, 1), round(bmi_max, 1)), step=.1, key="bmi_filter"
 )
 children_filter = st.sidebar.slider(
-    "👶 Children", children_min, children_max, (children_min, children_max)
+    "👶 Children", children_min, children_max, (children_min, children_max), key="children_filter"
 )
-sex_filter = st.sidebar.multiselect("🚻 Sex", sex_options, default=sex_options)
-smoker_filter = st.sidebar.multiselect("🚬 Smoker status", smoker_options, default=smoker_options)
-region_filter = st.sidebar.multiselect("📍 Region", region_options, default=region_options)
+sex_filter = st.sidebar.multiselect("🚻 Sex", sex_options, default=sex_options, key="sex_filter")
+smoker_filter = st.sidebar.multiselect("🚬 Smoker", smoker_options, default=smoker_options, key="smoker_filter")
+region_filter = st.sidebar.multiselect("📍 Region", region_options, default=region_options, key="region_filter")
 
 filtered_data = data[
-    data["age"].between(*age_filter)
-    & data["bmi"].between(*bmi_filter)
-    & data["children"].between(*children_filter)
-    & data["sex"].astype(str).isin(sex_filter)
-    & data["smoker"].astype(str).isin(smoker_filter)
-    & data["region"].astype(str).isin(region_filter)
+    data.age.between(*age_filter)
+    & data.bmi.between(*bmi_filter)
+    & data.children.between(*children_filter)
+    & data.sex.astype(str).isin(sex_filter)
+    & data.smoker.astype(str).isin(smoker_filter)
+    & data.region.astype(str).isin(region_filter)
 ].copy()
 
-st.sidebar.divider()
 st.sidebar.metric("Filtered records", f"{len(filtered_data):,}")
-st.sidebar.caption(f"Current best saved test model: **{best_model_name}**")
+st.sidebar.caption(f"Best saved holdout model: **{best_model_name}**")
+st.sidebar.button("↺ Reset dataset filters", on_click=reset_filters, width="stretch")
 
-if st.sidebar.button("↺ Reset filters", width="stretch"):
-    st.rerun()
-
-
-# -----------------------------------------------------------------------------
-# Header
-# -----------------------------------------------------------------------------
 st.markdown(
     """
     <div class="hero">
-        <h1>🏥 Medical Insurance Charges Regression</h1>
-        <p>
-            End-to-end machine learning portfolio dashboard comparing Linear Regression,
-            Polynomial Regression, and Decision Tree Regression.
-        </p>
+      <h1>🏥 Medical Insurance Charges Regression</h1>
+      <p>Professional ML portfolio dashboard comparing Linear Regression, Polynomial Regression, and Decision Tree Regression.</p>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-status_cols = st.columns(5)
-status_cols[0].metric("Dataset rows", f"{len(data):,}")
-status_cols[1].metric("Trained models", f"{len(models)}/3")
-status_cols[2].metric("Best test model", best_model_name.replace(" Regression", ""))
-status_cols[3].metric("Median charge", format_currency(median_charge))
-status_cols[4].metric("Filtered records", f"{len(filtered_data):,}")
+head = st.columns(5)
+head[0].metric("Dataset rows", f"{len(data):,}")
+head[1].metric("Models loaded", f"{len(available_models)}/3")
+head[2].metric("Best test model", best_model_name.replace(" Regression", ""))
+head[3].metric("Median charge", format_currency(median_charge))
+head[4].metric("Filtered rows", f"{len(filtered_data):,}")
 
-st.caption(
-    "Educational portfolio project. Predictions are descriptive ML outputs and are not intended "
-    "for real insurance underwriting, pricing, eligibility, or adverse-action decisions."
-)
+st.caption("Educational portfolio project only — not for real insurance pricing, underwriting, eligibility, or adverse-action decisions.")
 
+overview_tab, prediction_tab, performance_tab, insights_tab, explorer_tab, files_tab = st.tabs([
+    "🏠 Executive Overview", "🔮 Prediction Lab", "📊 Model Performance",
+    "🧠 Drivers & Insights", "🔎 Data Explorer", "📄 Project Files"
+])
 
-# -----------------------------------------------------------------------------
-# Tabs
-# -----------------------------------------------------------------------------
-overview_tab, prediction_tab, performance_tab, insights_tab, explorer_tab, docs_tab = st.tabs(
-    [
-        "🏠 Executive Overview",
-        "🔮 Prediction Lab",
-        "📊 Model Performance",
-        "🧠 Drivers & Insights",
-        "🔎 Data Explorer",
-        "📄 Project Files",
-    ]
-)
-
-
-# -----------------------------------------------------------------------------
-# Executive overview
-# -----------------------------------------------------------------------------
 with overview_tab:
     st.subheader("Executive overview")
-
     if filtered_data.empty:
-        st.warning("No records match the selected sidebar filters.")
+        st.warning("No rows match the current filters.")
     else:
-        avg_charge = float(filtered_data["charges"].mean())
-        avg_age = float(filtered_data["age"].mean())
-        avg_bmi = float(filtered_data["bmi"].mean())
-        smoker_share = filtered_data["smoker"].astype(str).str.lower().eq("yes").mean() * 100
-
-        metric_cols = st.columns(4)
-        metric_cols[0].metric("Average charge", format_currency(avg_charge))
-        metric_cols[1].metric("Average age", f"{avg_age:.1f}")
-        metric_cols[2].metric("Average BMI", f"{avg_bmi:.1f}")
-        metric_cols[3].metric("Smoker share", f"{smoker_share:.1f}%")
+        c = st.columns(4)
+        c[0].metric("Average charge", format_currency(float(filtered_data.charges.mean())))
+        c[1].metric("Average age", f"{filtered_data.age.mean():.1f}")
+        c[2].metric("Average BMI", f"{filtered_data.bmi.mean():.1f}")
+        smoker_share = filtered_data.smoker.astype(str).str.lower().eq("yes").mean() * 100
+        c[3].metric("Smoker share", f"{smoker_share:.1f}%")
 
         left, right = st.columns(2)
         with left:
             st.markdown("#### Charge distribution")
-            st.altair_chart(charge_distribution_chart(filtered_data), width="stretch")
+            hist = alt.Chart(filtered_data).mark_bar().encode(
+                x=alt.X("charges:Q", bin=alt.Bin(maxbins=35), title="Charges"),
+                y=alt.Y("count():Q", title="Records")
+            ).properties(height=320)
+            st.altair_chart(hist, width="stretch")
         with right:
             st.markdown("#### Charges by smoking status")
-            st.altair_chart(smoker_charge_chart(filtered_data), width="stretch")
+            box = alt.Chart(filtered_data).mark_boxplot(size=45).encode(
+                x=alt.X("smoker:N", title="Smoker"),
+                y=alt.Y("charges:Q", title="Charges")
+            ).properties(height=320)
+            st.altair_chart(box, width="stretch")
 
     st.markdown(
-        f"""
-        <div class="best-model">
-        <strong>Best saved test model:</strong> {best_model_name}. The selection is based on the
-        lowest saved holdout Test RMSE in <code>reports/model_comparison.csv</code>.
-        </div>
-        """,
+        f'<div class="best-model"><strong>Best saved holdout model:</strong> {best_model_name}. Selection is based on the lowest Test RMSE in <code>reports/model_comparison.csv</code>.</div>',
         unsafe_allow_html=True,
     )
 
-
-# -----------------------------------------------------------------------------
-# Prediction lab
-# -----------------------------------------------------------------------------
 with prediction_tab:
     st.subheader("Prediction lab")
-    st.write(
-        "Choose a trained model or compare all three models using the same customer profile. "
-        "The selector makes it easy to inspect how model choice changes the predicted charge."
-    )
-
-    available_model_names = [name for name in MODEL_PATHS if name in models]
-    prediction_mode_options = ["Compare all models"] + available_model_names
-
-    selected_model = st.selectbox(
-        "🧠 Select prediction model",
-        options=prediction_mode_options,
-        index=0,
-        help="Compare all saved models or run a prediction using one selected model.",
-    )
+    st.info(f"Current model selection: **{selected_model}**. Change it anytime from the left sidebar.")
 
     c1, c2, c3 = st.columns(3)
     with c1:
-        age = st.slider("Age", age_min, age_max, int(data["age"].median()))
-        sex = st.selectbox("Sex", sex_options)
+        age = st.slider("Age", age_min, age_max, int(data.age.median()), key="pred_age")
+        sex = st.selectbox("Sex", sex_options, key="pred_sex")
     with c2:
-        bmi = st.slider(
-            "BMI",
-            min_value=round(bmi_min, 1),
-            max_value=round(bmi_max, 1),
-            value=round(float(data["bmi"].median()), 1),
-            step=0.1,
-        )
-        children = st.slider(
-            "Children", children_min, children_max, int(data["children"].median())
-        )
+        bmi = st.slider("BMI", round(bmi_min,1), round(bmi_max,1), round(float(data.bmi.median()),1), step=.1, key="pred_bmi")
+        children = st.slider("Children", children_min, children_max, int(data.children.median()), key="pred_children")
     with c3:
-        smoker = st.selectbox("Smoker", smoker_options)
-        region = st.selectbox("Region", region_options)
+        smoker = st.selectbox("Smoker", smoker_options, key="pred_smoker")
+        region = st.selectbox("Region", region_options, key="pred_region")
 
-    profile = pd.DataFrame(
-        [{
-            "age": age,
-            "sex": sex,
-            "bmi": bmi,
-            "children": children,
-            "smoker": smoker,
-            "region": region,
-        }]
-    )
+    profile = pd.DataFrame([{
+        "age": age, "sex": sex, "bmi": bmi, "children": children,
+        "smoker": smoker, "region": region,
+    }])
 
     if st.button("💰 Generate prediction", type="primary", width="stretch"):
-        if not models:
-            st.error("No trained model artifacts could be loaded.")
+        if not available_models:
+            st.error("No trained model artifacts could be loaded. See Model load diagnostics in the sidebar.")
         else:
             try:
                 if selected_model == "Compare all models":
-                    predictions = []
-                    for model_name in available_model_names:
-                        prediction = float(models[model_name].predict(profile)[0])
-                        predictions.append({"Model": model_name, "Predicted Charge": prediction})
-
-                    prediction_df = pd.DataFrame(predictions)
-                    prediction_df["Predicted Charge"] = prediction_df["Predicted Charge"].round(2)
-                    prediction_df["Difference vs lowest"] = (
-                        prediction_df["Predicted Charge"] - prediction_df["Predicted Charge"].min()
-                    ).round(2)
-
-                    st.markdown("#### Three-model prediction comparison")
-                    st.dataframe(
-                        prediction_df.style.format({
-                            "Predicted Charge": "${:,.2f}",
-                            "Difference vs lowest": "${:,.2f}",
-                        }),
-                        width="stretch",
-                        hide_index=True,
-                    )
-
-                    chart_df = prediction_df.copy()
-                    comparison_chart = (
-                        alt.Chart(chart_df)
-                        .mark_bar(cornerRadiusTopLeft=7, cornerRadiusTopRight=7)
-                        .encode(
-                            x=alt.X(field="Model", type="nominal", title=None, sort=None),
-                            y=alt.Y(field="Predicted Charge", type="quantitative", title="Predicted charge"),
-                            tooltip=[
-                                alt.Tooltip(field="Model", type="nominal"),
-                                alt.Tooltip(field="Predicted Charge", type="quantitative", format="$,.2f"),
-                            ],
-                        )
-                        .properties(height=340)
-                    )
-                    st.altair_chart(comparison_chart, width="stretch")
-
-                    if best_model_name in prediction_df["Model"].values:
-                        best_prediction = float(
-                            prediction_df.loc[
-                                prediction_df["Model"] == best_model_name,
-                                "Predicted Charge",
-                            ].iloc[0]
-                        )
-                        st.success(
-                            f"Portfolio default: **{best_model_name}** → {format_currency(best_prediction)}"
-                        )
+                    rows = []
+                    for name in available_models:
+                        pred = float(models[name].predict(profile)[0])
+                        rows.append({"Model": name, "Predicted Charge": pred})
+                    pred_df = pd.DataFrame(rows)
+                    pred_df["Predicted Charge"] = pred_df["Predicted Charge"].round(2)
+                    st.dataframe(pred_df.style.format({"Predicted Charge": "${:,.2f}"}), width="stretch", hide_index=True)
+                    chart = alt.Chart(pred_df).mark_bar(cornerRadiusTopLeft=7, cornerRadiusTopRight=7).encode(
+                        x=alt.X("Model:N", title=None, sort=None),
+                        y=alt.Y("Predicted Charge:Q", title="Predicted charge"),
+                        tooltip=[alt.Tooltip("Model:N"), alt.Tooltip("Predicted Charge:Q", format="$,.2f")]
+                    ).properties(height=330)
+                    st.altair_chart(chart, width="stretch")
+                    if best_model_name in pred_df.Model.values:
+                        best_pred = float(pred_df.loc[pred_df.Model == best_model_name, "Predicted Charge"].iloc[0])
+                        st.success(f"Portfolio default — **{best_model_name}**: {format_currency(best_pred)}")
                 else:
-                    prediction = float(models[selected_model].predict(profile)[0])
-                    st.metric(f"Predicted charge — {selected_model}", format_currency(prediction))
-
-                    if prediction < q1_charge:
+                    pred = float(models[selected_model].predict(profile)[0])
+                    st.metric(f"Predicted charge — {selected_model}", format_currency(pred))
+                    if pred < q1_charge:
                         band = "Lower-cost band"
-                    elif prediction > q3_charge:
+                    elif pred > q3_charge:
                         band = "Higher-cost band"
                     else:
                         band = "Mid-cost band"
-
-                    st.info(
-                        f"Descriptive predicted-cost segment: **{band}**. "
-                        "This is not an actuarial or underwriting risk classification."
-                    )
-
-                    if selected_model == best_model_name:
-                        st.success("This is the strongest saved holdout-test model in the project.")
-                    else:
-                        st.caption(
-                            f"Saved holdout-test comparison currently identifies **{best_model_name}** "
-                            "as the lowest-RMSE model."
-                        )
+                    st.info(f"Descriptive cost segment: **{band}**. This is not an underwriting classification.")
             except Exception as exc:
                 st.error(f"Prediction failed: {exc}")
 
-
-# -----------------------------------------------------------------------------
-# Model performance
-# -----------------------------------------------------------------------------
 with performance_tab:
     st.subheader("Model performance")
-
     if comparison.empty:
         st.warning("Model comparison report is unavailable.")
     else:
         st.dataframe(comparison, width="stretch", hide_index=True)
-
-        metric_options = [
-            col for col in ["Test RMSE", "Test MAE", "Test MSE", "Test R2", "Test R²"]
-            if col in comparison.columns
-        ]
-        if "Model" in comparison.columns and metric_options:
-            selected_metric = st.selectbox("Performance metric", metric_options)
-            st.altair_chart(model_metric_chart(comparison, selected_metric), width="stretch")
-
-        if "Test RMSE" in comparison.columns and "Model" in comparison.columns:
-            rmse = pd.to_numeric(comparison["Test RMSE"], errors="coerce")
-            if rmse.notna().any():
-                row = comparison.loc[rmse.idxmin()]
-                st.success(
-                    f"Best saved holdout result: **{row['Model']}** with Test RMSE "
-                    f"**{float(row['Test RMSE']):,.2f}**."
-                )
-
+        metrics = [c for c in ["Test RMSE", "Test MAE", "Test MSE", "Test R2", "Test R²"] if c in comparison.columns]
+        if "Model" in comparison.columns and metrics:
+            metric = st.selectbox("Performance metric", metrics)
+            st.altair_chart(model_metric_chart(comparison, metric), width="stretch")
+        st.success(f"Best saved holdout model: **{best_model_name}**")
         if not cv_results.empty:
             with st.expander("Cross-validation results"):
                 st.dataframe(cv_results, width="stretch", hide_index=True)
-
         if not diagnostics.empty:
             with st.expander("Model diagnostics"):
                 st.dataframe(diagnostics, width="stretch", hide_index=True)
 
-    st.markdown(
-        """
-        **How to interpret the models**
-
-        - **Linear Regression:** transparent baseline and easiest to explain.
-        - **Polynomial Regression:** captures nonlinear relationships while retaining a regression form.
-        - **Decision Tree Regression:** strongest saved test performance and naturally captures thresholds and interactions.
-        """
-    )
-
-
-# -----------------------------------------------------------------------------
-# Drivers and insights
-# -----------------------------------------------------------------------------
 with insights_tab:
     st.subheader("Drivers and business insights")
-
     smoker_means = data.groupby("smoker")["charges"].mean()
-    insight_cols = st.columns(3)
-    insight_cols[0].metric("Rows after cleaning", f"{len(data):,}")
-    insight_cols[1].metric(
-        "Mean charges — smokers",
-        format_currency(float(smoker_means.get("yes", float("nan")))),
-    )
-    insight_cols[2].metric(
-        "Mean charges — non-smokers",
-        format_currency(float(smoker_means.get("no", float("nan")))),
-    )
-
-    st.markdown(
-        """
-        - Smoking status is strongly associated with higher observed charges in this dataset.
-        - Age and BMI show meaningful relationships with insurance charges.
-        - The improvement of nonlinear models over Linear Regression suggests interaction and threshold effects.
-        - Region, sex, and number of children show smaller descriptive differences than smoking status in this sample.
-        - These results are predictive/associational and do not establish causation.
-        """
-    )
-
+    c = st.columns(3)
+    c[0].metric("Rows after cleaning", f"{len(data):,}")
+    c[1].metric("Mean charges — smokers", format_currency(float(smoker_means.get("yes", float("nan")))))
+    c[2].metric("Mean charges — non-smokers", format_currency(float(smoker_means.get("no", float("nan")))))
+    st.markdown("""
+    - Smoking status is strongly associated with higher observed charges in this dataset.
+    - Age and BMI show meaningful relationships with insurance charges.
+    - Nonlinear models outperform the linear baseline on the saved holdout set.
+    - Findings are predictive/associational and do not establish causation.
+    """)
     if not importance.empty and {"Feature", "importance"}.issubset(importance.columns):
         st.markdown("#### Decision Tree feature importance")
         st.altair_chart(feature_importance_chart(importance), width="stretch")
         st.dataframe(importance.head(15), width="stretch", hide_index=True)
-
     if not segments.empty:
         st.markdown("#### Predicted-cost segmentation")
         st.dataframe(segments, width="stretch", hide_index=True)
 
-
-# -----------------------------------------------------------------------------
-# Data explorer
-# -----------------------------------------------------------------------------
 with explorer_tab:
     st.subheader("Filtered dataset explorer")
-
     if filtered_data.empty:
-        st.warning("No rows match the current sidebar filters.")
+        st.warning("No rows match the current filters.")
     else:
-        summary_cols = st.columns(4)
-        summary_cols[0].metric("Records", f"{len(filtered_data):,}")
-        summary_cols[1].metric("Average charge", format_currency(float(filtered_data["charges"].mean())))
-        summary_cols[2].metric("Average age", f"{filtered_data['age'].mean():.1f}")
-        summary_cols[3].metric("Average BMI", f"{filtered_data['bmi'].mean():.1f}")
-
+        c = st.columns(4)
+        c[0].metric("Records", f"{len(filtered_data):,}")
+        c[1].metric("Average charge", format_currency(float(filtered_data.charges.mean())))
+        c[2].metric("Average age", f"{filtered_data.age.mean():.1f}")
+        c[3].metric("Average BMI", f"{filtered_data.bmi.mean():.1f}")
         st.dataframe(filtered_data, width="stretch", hide_index=True)
-
-        csv_bytes = filtered_data.to_csv(index=False).encode("utf-8")
         st.download_button(
             "⬇️ Download filtered CSV",
-            data=csv_bytes,
+            data=filtered_data.to_csv(index=False).encode("utf-8"),
             file_name="medical_insurance_filtered.csv",
             mime="text/csv",
         )
-
         with st.expander("Descriptive statistics"):
             st.dataframe(filtered_data.describe(include="all").transpose(), width="stretch")
 
-
-# -----------------------------------------------------------------------------
-# Project files
-# -----------------------------------------------------------------------------
-with docs_tab:
+with files_tab:
     st.subheader("Project files and reproducibility")
-
-    st.markdown(
-        """
-        The repository contains the complete portfolio workflow: executed notebook, reusable source files,
-        three trained model pipelines, analysis reports, visualizations, professional documentation,
-        and this Streamlit application.
-        """
-    )
-
-    file_cols = st.columns(2)
-    with file_cols[0]:
+    st.markdown("Complete portfolio workflow: notebook, reusable source files, three saved model pipelines, reports, visualizations, documentation, and Streamlit app.")
+    c1, c2 = st.columns(2)
+    with c1:
         if REPORT_MD_PATH.exists():
-            st.download_button(
-                "⬇️ Download project report (Markdown)",
-                data=REPORT_MD_PATH.read_text(encoding="utf-8"),
-                file_name="project_report.md",
-                mime="text/markdown",
-                width="stretch",
-            )
-    with file_cols[1]:
+            st.download_button("⬇️ Project report (Markdown)", REPORT_MD_PATH.read_text(encoding="utf-8"), "project_report.md", "text/markdown", width="stretch")
+    with c2:
         if REPORT_PDF_PATH.exists():
-            st.download_button(
-                "⬇️ Download project report (PDF)",
-                data=REPORT_PDF_PATH.read_bytes(),
-                file_name="project_report.pdf",
-                mime="application/pdf",
-                width="stretch",
-            )
+            st.download_button("⬇️ Project report (PDF)", REPORT_PDF_PATH.read_bytes(), "project_report.pdf", "application/pdf", width="stretch")
+    st.markdown("""
+    **Reproducibility controls**
+    - target `charges` is excluded from the feature matrix
+    - preprocessing stays inside scikit-learn pipelines
+    - tuning uses training data only
+    - the final test set is reserved for final evaluation
+    - `random_state=42` is used where applicable
+    """)
 
-    st.markdown(
-        """
-        **Reproducibility controls**
-
-        - target `charges` is excluded from the feature matrix
-        - preprocessing remains inside scikit-learn pipelines
-        - model selection/tuning uses training data only
-        - final evaluation uses an untouched holdout test set
-        - `random_state=42` is used where applicable
-        """
-    )
-
-
-# -----------------------------------------------------------------------------
-# Footer
-# -----------------------------------------------------------------------------
 st.divider()
-st.caption(
-    "Medical Insurance Charges Regression • Linear vs Polynomial vs Decision Tree • "
-    "Portfolio project by Alok Agarwal"
-)
+st.caption("Medical Insurance Charges Regression • Linear vs Polynomial vs Decision Tree • Portfolio project by Alok Agarwal")
