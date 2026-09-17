@@ -10,3 +10,6 @@ Documented separation of raw and processed insurance data for reproducible analy
 
 ## 03 — Data quality
 Recorded the missing-value and duplicate-record checks used before model training.
+
+## 04 — Exploratory analysis
+Documented age, BMI, children, smoking status, and charge relationships explored before modeling.
