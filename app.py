@@ -39,11 +39,11 @@ st.markdown(
     """
     <style>
       .block-container {max-width: 1450px; padding-top: 1.4rem; padding-bottom: 3rem;}
-      [data-testid="stMetric"] {background: rgba(120,120,120,.06); border: 1px solid rgba(120,120,120,.18); border-radius: 14px; padding: .85rem;}
-      .hero {padding: 1.3rem 1.45rem; border: 1px solid rgba(120,120,120,.20); border-radius: 18px; background: linear-gradient(135deg, rgba(37,99,235,.10), rgba(16,185,129,.07)); margin-bottom: 1rem;}
+      [data-testid="stMetric"] {background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.10); border-radius: 14px; padding: .85rem;}
+      .hero {padding: 1.3rem 1.45rem; border: 1px solid rgba(255,255,255,.10); border-radius: 18px; background: linear-gradient(135deg, rgba(79,139,249,.16), rgba(16,185,129,.10)); margin-bottom: 1rem;}
       .hero h1 {margin: 0 0 .35rem 0; font-size: 2rem;}
       .hero p {margin: 0; opacity: .82;}
-      .best-model {padding: .95rem 1rem; border: 1px solid rgba(16,185,129,.30); background: rgba(16,185,129,.07); border-radius: 12px; margin: .6rem 0 1rem 0;}
+      .best-model {padding: .95rem 1rem; border: 1px solid rgba(16,185,129,.30); background: rgba(16,185,129,.08); border-radius: 12px; margin: .6rem 0 1rem 0;}
     </style>
     """,
     unsafe_allow_html=True,
@@ -180,7 +180,6 @@ available_models = [name for name in MODEL_PATHS if name in models]
 
 age_min, age_max = int(data.age.min()), int(data.age.max())
 bmi_min, bmi_max = float(data.bmi.min()), float(data.bmi.max())
-# Expand BMI slider bounds outward to the nearest 0.1 so default filters include every row.
 bmi_slider_min = math.floor(bmi_min * 10) / 10
 bmi_slider_max = math.ceil(bmi_max * 10) / 10
 children_min, children_max = int(data.children.min()), int(data.children.max())
@@ -254,12 +253,11 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-head = st.columns(5)
+head = st.columns(4)
 head[0].metric("Dataset rows", f"{len(data):,}")
 head[1].metric("Models loaded", f"{len(available_models)}/3")
-head[2].metric("Best test model", best_model_name.replace(" Regression", ""))
-head[3].metric("Median charge", format_currency(median_charge))
-head[4].metric("Filtered rows", f"{len(filtered_data):,}")
+head[2].metric("Median charge", format_currency(median_charge))
+head[3].metric("Filtered rows", f"{len(filtered_data):,}")
 
 if len(filtered_data) == len(data):
     st.caption("All dataset rows are currently included in the sidebar filters.")
