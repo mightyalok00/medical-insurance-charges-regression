@@ -13,3 +13,6 @@ Recorded the missing-value and duplicate-record checks used before model trainin
 
 ## 04 — Exploratory analysis
 Documented age, BMI, children, smoking status, and charge relationships explored before modeling.
+
+## 05 — Leakage prevention
+Recorded the train/test split strategy and pipeline-based preprocessing used to protect the final test set.
