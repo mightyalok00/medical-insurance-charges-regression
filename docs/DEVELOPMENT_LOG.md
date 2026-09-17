@@ -7,3 +7,6 @@ Documented the end-to-end objective: predict medical insurance charges using Lin
 
 ## 02 — Dataset organization
 Documented separation of raw and processed insurance data for reproducible analysis.
+
+## 03 — Data quality
+Recorded the missing-value and duplicate-record checks used before model training.
