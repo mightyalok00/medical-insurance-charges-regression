@@ -1,0 +1,18 @@
+Question,Requirement,Coverage,Evidence
+1,Dataset Structure and Data Types,Full,"Notebook Sections 2; shape, dtypes, unique values, descriptive statistics"
+2,Data Quality and Cleaning,Full,Notebook Section 3; missing/duplicate checks and cleaned CSV
+3,Categorical Encoding,Full,Notebook Section 6; OneHotEncoder in pipeline
+4,Numerical Relationships and EDA,Full,Notebook Section 4; correlations and age/BMI plots
+5,Smoking and Insurance Charges,Full,Notebook Section 4/13; grouped mean/median and boxplot
+6,Train-Test Split and Leakage Prevention,Full,Notebook Sections 5-6; untouched 20% test and pipeline preprocessing
+7,Linear Regression Baseline,Full,"Notebook Section 7/10; MAE, MSE, RMSE, R2"
+8,Polynomial Regression,Full,Notebook Section 8/10; degrees selected by 5-fold CV
+9,Decision Tree Regression,Full,Notebook Section 9/10; tuned depth/split/leaf parameters
+10,Model Performance Comparison,Full,Notebook Section 10; same split and all required metrics
+11,Feature Importance and Model Interpretation,Full,Notebook Section 12; Linear + Polynomial coefficients and Tree importance
+12,Business Use and Model Limitations,Full,Notebook business interpretation and final limitations/fairness notes
+13,Loop-Based Model Training,Full,Notebook Section 10; dictionary + reusable training/evaluation loop
+14,Professional Folder Structure for Submission,Full,"Project folders separate data, notebooks, src, models, reports, images, docs"
+15,Deep Business Analysis,Full,"Notebook Section 13; observed segments, predicted-cost bands, pricing/risk/cost implications"
+16,Complete Three-Model Comparison,Full,"Notebook Section 14; train/test gaps, RMSE improvement, diagnosis, complexity trade-off"
+17,Cross-Validation and Hyperparameter Tuning,Full,"Notebook Sections 8, 9, 11; 5-fold CV and training-only tuning"

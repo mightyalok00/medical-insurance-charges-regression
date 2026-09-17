@@ -1,0 +1,8 @@
+column,dtype,missing,unique
+age,int64,0,47
+sex,object,0,2
+bmi,float64,0,548
+children,int64,0,6
+smoker,object,0,2
+region,object,0,4
+charges,float64,0,1337

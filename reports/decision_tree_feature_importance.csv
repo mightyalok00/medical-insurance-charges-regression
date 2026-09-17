@@ -1,0 +1,9 @@
+,importance
+cat__smoker_yes,0.7007131351676096
+num__bmi,0.17217908237652924
+num__age,0.11886868277506375
+num__children,0.008239099680797578
+cat__sex_male,0.0
+cat__region_northwest,0.0
+cat__region_southeast,0.0
+cat__region_southwest,0.0
