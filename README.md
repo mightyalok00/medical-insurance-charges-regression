@@ -33,7 +33,7 @@ All **17 project questions are explicitly covered**. See `reports/question_cover
 ## Folder Structure
 
 ```text
-Medical Insurance/
+medical-insurance-charges-regression/
 ├── data/
 │   ├── raw/insurance.csv
 │   └── processed/insurance_cleaned.csv
@@ -60,7 +60,8 @@ Medical Insurance/
 │   ├── project_report.md
 │   └── project_report.pdf
 ├── images/
-├── docs/Insurance_Regression_Project_Questions.docx
+├── docs/
+│   └── Insurance_Regression_Project_Questions.docx
 ├── app.py
 ├── README.md
 ├── requirements.txt
@@ -105,23 +106,23 @@ jupyter notebook notebooks/insurance_model_training.ipynb
 
 ## Windows Project Location
 
-This package is prepared to be extracted so the project folder is:
+Current local project folder:
 
 ```text
-D:\Medical-Insurances\Medical Insurance
+D:\Medical Insurance
 ```
 
 Run the dashboard from PowerShell:
 
 ```powershell
-cd "D:\Medical-Insurances\Medical Insurance"
+cd "D:\Medical Insurance"
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-The dashboard uses paths relative to `app.py`, so models, reports, and data load correctly from `D:\Medical-Insurances\Medical Insurance` without hard-coded machine-specific paths. The notebook also resolves the project root automatically when launched either from the project root or from the `notebooks` folder.
+The dashboard uses paths relative to `app.py`, so models, reports, and data load correctly without hard-coded machine-specific paths. The notebook also resolves the project root automatically when launched either from the project root or from the `notebooks` folder.
 
 ## Dashboard Filters
 
