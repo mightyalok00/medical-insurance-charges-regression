@@ -4,6 +4,10 @@ End-to-end machine learning portfolio project for predicting medical insurance c
 
 > **Portfolio focus:** reproducible regression workflow, model comparison, business interpretation, and deployment-ready project structure.
 
+## Live Demo
+
+🚀 **Try the deployed Streamlit application:** [Medical Insurance Charges Regression App](https://medical-insurance-charges-regression.streamlit.app/)
+
 ---
 
 ## Project Objective
@@ -150,6 +154,10 @@ The root-level `app.py` provides a professional interactive dashboard with:
 - interactive dataset filters
 - filtered CSV download
 - access to saved reports and diagnostics
+
+### Live application
+
+👉 [Open the Medical Insurance Charges Regression Streamlit App](https://medical-insurance-charges-regression.streamlit.app/)
 
 Run it locally with:
 
@@ -301,3 +309,5 @@ The project therefore demonstrates not only model training, but also **responsib
 **Alok Agarwal**
 
 GitHub: [mightyalok00](https://github.com/mightyalok00)
+
+Live App: [Medical Insurance Charges Regression](https://medical-insurance-charges-regression.streamlit.app/)
