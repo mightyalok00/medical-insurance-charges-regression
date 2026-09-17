@@ -1,26 +1,22 @@
 # 🏥 Medical Insurance Charges Regression
 
-End-to-end machine learning portfolio project for predicting medical insurance charges using **Linear Regression**, **Polynomial Regression**, and **Decision Tree Regression**.
+End-to-end machine learning portfolio project for predicting medical insurance charges with **Linear Regression**, **Polynomial Regression**, and **Decision Tree Regression**.
 
-The project covers the complete workflow from raw data to deployment: data cleaning, exploratory analysis, leakage-safe preprocessing, model training, cross-validation, hyperparameter tuning, evaluation, interpretation, business analysis, saved model pipelines, and a professional Streamlit dashboard.
+The repository covers data cleaning, EDA, leakage-safe preprocessing, cross-validation, hyperparameter tuning, model comparison, interpretation, business analysis, saved model pipelines, reports, and an interactive Streamlit application.
 
-> **Portfolio focus:** reproducible regression workflow, model comparison, business interpretation, model selection, and deployment-ready project structure.
-
----
+> **Portfolio focus:** reproducible regression workflow, transparent model comparison, business interpretation, and deployment-ready project structure.
 
 ## 🚀 Live Demo
 
-**Streamlit App:**  
-https://medical-insurance-charges-regression.streamlit.app/
+**Streamlit App:** https://medical-insurance-charges-regression.streamlit.app/
 
-**GitHub Repository:**  
-https://github.com/mightyalok00/medical-insurance-charges-regression
+**GitHub:** https://github.com/mightyalok00/medical-insurance-charges-regression
 
 ---
 
 ## 🎯 Project Objective
 
-The objective is to estimate the target variable `charges` using the following customer attributes:
+Predict the target variable `charges` using:
 
 - `age`
 - `sex`
@@ -29,7 +25,7 @@ The objective is to estimate the target variable `charges` using the following c
 - `smoker`
 - `region`
 
-Three regression approaches are trained and compared to understand the trade-offs between **simplicity, interpretability, nonlinearity, flexibility, and predictive performance**.
+The project compares three regression approaches to show the trade-off between **simplicity, interpretability, nonlinear modeling, and predictive performance**.
 
 ---
 
@@ -41,21 +37,20 @@ Three regression approaches are trained and compared to understand the trade-off
 | Cleaned dataset | **1,337 rows** |
 | Exact duplicates removed | **1** |
 | Missing values | **None found** |
-| Target | `charges` |
 | Train/test split | **80/20** |
 | Cross-validation | **5-fold** |
 | Models trained | **3** |
-| Evaluation metrics | **MAE, MSE, RMSE, R²** |
+| Metrics | **MAE, MSE, RMSE, R²** |
 | Best saved holdout model | **Decision Tree Regression** |
-| Reproducibility seed | `random_state=42` |
+| Reproducibility | `random_state=42` |
 
-The final test set is kept untouched during model selection and tuning. Preprocessing is contained inside scikit-learn pipelines to reduce leakage risk.
+The final test set is kept untouched during model selection and tuning. Preprocessing remains inside scikit-learn pipelines to reduce leakage risk.
 
 ---
 
-# 📊 Three-Model Comparison
+## 📊 Three-Model Comparison
 
-All three models were trained and evaluated using the same final test split.
+All three models use the same final holdout split.
 
 | Model | Test MAE | Test MSE | Test RMSE | Test R² |
 |---|---:|---:|---:|---:|
@@ -65,86 +60,40 @@ All three models were trained and evaluated using the same final test split.
 
 Source: `reports/model_comparison.csv`
 
-## 🏆 Which model performs best?
+### 🏆 Best model in this project
 
-For this dataset and saved holdout-test evaluation, **Decision Tree Regression performs best**.
+Based on the saved holdout-test results, **Decision Tree Regression** performs best because it has the lowest MAE, MSE, and RMSE and the highest R² among the three models.
 
-It has:
+Compared with Linear Regression:
 
-- the **lowest Test MAE**
-- the **lowest Test MSE**
-- the **lowest Test RMSE**
-- the **highest Test R²**
+- Polynomial Regression reduces Test RMSE by about **22%**.
+- Decision Tree Regression reduces Test RMSE by about **27%**.
 
-The tuned Decision Tree achieved:
+This suggests that nonlinear relationships and feature interactions are important in this dataset.
 
-- **Test MAE:** 2,621.31
-- **Test RMSE:** 4,345.88
-- **Test R²:** 0.8972
-
-### RMSE improvement over Linear Regression
-
-- Polynomial Regression improves RMSE by approximately **22.0%**
-- Decision Tree Regression improves RMSE by approximately **27.0%**
-
-This indicates that nonlinear relationships and interactions are important in the dataset.
-
-> **Important:** “Best” here means best on the saved holdout metrics for this project. Real production model selection would also require stability checks, external validation, fairness testing, monitoring, and domain review.
+> “Best” means best on this project’s saved holdout metrics. A production model would still need external validation, monitoring, fairness testing, domain review, and stability checks.
 
 ---
 
-## 🧠 Model-by-Model Interpretation
+## 🧠 Model Interpretation
 
-### 1. Linear Regression
+### Linear Regression
 
-**Role:** baseline model
+A simple and transparent baseline. It is easy to explain but does not capture all nonlinear structure in the data.
 
-**Strengths**
+### Polynomial Regression
 
-- simple
-- transparent
-- easy to explain
-- useful for directional interpretation
+A nonlinear extension of the linear baseline. It improves predictive performance by modeling interactions and nonlinear effects while retaining a regression form.
 
-**Limitation**
+### Decision Tree Regression
 
-Its lower R² suggests that a purely linear structure does not fully capture the relationships in insurance charges.
-
-### 2. Polynomial Regression
-
-**Role:** nonlinear extension of the linear baseline
-
-**Strengths**
-
-- captures nonlinear effects
-- models interactions
-- substantially improves RMSE over Linear Regression
-
-**Limitation**
-
-Polynomial feature expansion increases complexity and may reduce interpretability as the number of terms grows.
-
-### 3. Decision Tree Regression
-
-**Role:** strongest predictive model in the saved evaluation
-
-**Strengths**
-
-- captures nonlinear thresholds naturally
-- models interactions without manual polynomial expansion
-- strongest saved MAE, MSE, RMSE, and R² results
-
-**Limitation**
-
-Decision Trees can overfit if not controlled, which is why this project uses tuning and cross-validation.
+The strongest saved holdout performer. It naturally captures thresholds and interactions without manual polynomial expansion. The project uses tuning and cross-validation to control complexity.
 
 ---
 
-# 🔮 Professional Streamlit Dashboard
+## 🔮 Streamlit Dashboard
 
-The root-level `app.py` provides an interactive ML portfolio application.
-
-### Main dashboard sections
+The root-level `app.py` provides a professional interactive dashboard with:
 
 - **Executive Overview**
 - **Prediction Lab**
@@ -153,156 +102,123 @@ The root-level `app.py` provides an interactive ML portfolio application.
 - **Data Explorer**
 - **Project Files**
 
-### Model selector
+### 🧠 Always-visible model selector
 
-The Prediction Lab now includes a model-selection filter with:
+The **left sidebar** now contains the prediction model selector, so it is visible immediately when the app opens.
+
+Available options:
 
 - `Compare all models`
 - `Linear Regression`
 - `Polynomial Regression`
 - `Decision Tree Regression`
 
-Users can therefore enter one customer profile and either:
+The selection controls the **Prediction Lab** tab.
 
-1. compare predictions from all three saved models side by side, or
-2. select one model and generate an individual prediction.
+When `Compare all models` is selected, the app shows predictions from every successfully loaded model in a comparison table and chart. When a single model is selected, the app displays that model’s prediction and descriptive cost band.
 
-When **Compare all models** is selected, the app displays:
+The sidebar also shows:
 
-- prediction values from all three models
-- a side-by-side comparison table
-- a prediction comparison chart
-- the portfolio default prediction from the strongest saved test model
+- how many of the three model artifacts loaded successfully
+- model-load diagnostics if any artifact fails
+- the best saved holdout model
 
-The dashboard also identifies **Decision Tree Regression** dynamically from the saved model-comparison report as the lowest-Test-RMSE model.
+### 🎛️ Dataset filters
 
----
-
-## 🎛️ Dashboard Filters
-
-The sidebar provides interactive dataset filters for:
+The sidebar also includes filters for:
 
 - 🎂 Age
 - ⚖️ BMI
-- 👶 Number of children
+- 👶 Children
 - 🚻 Sex
 - 🚬 Smoker status
 - 📍 Region
 
-The filtered dataset updates the dashboard metrics and visualizations in real time.
-
-Users can also download the currently filtered dataset as CSV.
+The reset button now resets the dataset filters correctly.
 
 ---
 
-# 💡 Key Business Findings
+## 💡 Key Business Findings
 
 - Smokers have substantially higher observed mean charges than non-smokers in this dataset.
-- Age and BMI show meaningful relationships with medical insurance charges.
-- The nonlinear models outperform the simple Linear Regression baseline.
-- Predicted-cost quartiles support descriptive customer segmentation.
+- Age and BMI show meaningful relationships with charges.
+- Nonlinear models outperform the simple linear baseline on the saved holdout set.
+- Predicted-cost quartiles support descriptive segmentation.
 - Region, sex, and number of children show smaller descriptive differences than smoking status in this sample.
 
-These insights are **predictive and associational, not causal**.
+These are **predictive/associational findings, not causal claims**.
 
-The project is intended for education and portfolio demonstration only. It should not be used for actual insurance pricing, underwriting, eligibility decisions, or adverse-action decisions without actuarial, regulatory, legal, fairness, temporal, and external validation.
+The project is for education and portfolio demonstration only and should not be used for real insurance pricing, underwriting, eligibility, or adverse-action decisions without actuarial, legal, regulatory, fairness, temporal, and external validation.
 
 ---
 
-# 🔄 Machine Learning Workflow
+## 🔄 Machine Learning Workflow
 
 ```text
 Raw Data
    ↓
 Data Quality Checks
    ↓
-Cleaning & Exploratory Data Analysis
+Cleaning & EDA
    ↓
 Feature / Target Separation
    ↓
 80/20 Train-Test Split
    ↓
-Leakage-Safe Preprocessing Pipelines
+Leakage-Safe Pipelines
    ↓
 Linear Regression
 Polynomial Regression
 Decision Tree Regression
    ↓
-5-Fold Cross-Validation / Hyperparameter Tuning
+5-Fold Cross-Validation / Tuning
    ↓
 Untouched Final Test Evaluation
    ↓
 MAE / MSE / RMSE / R² Comparison
    ↓
-Model Interpretation & Business Analysis
+Interpretation & Business Analysis
    ↓
-Saved Model Pipelines
-   ↓
-Professional Streamlit Dashboard
+Saved Models + Reports + Streamlit App
 ```
 
 ---
 
-# 🛡️ Leakage Prevention
+## 🛡️ Leakage Prevention
 
-The project follows a leakage-conscious training workflow:
-
-- `charges` is removed from the feature matrix before model training
-- preprocessing remains inside scikit-learn pipelines
-- model tuning is performed using training data only
-- polynomial degree selection is performed using training-only validation
-- Decision Tree tuning is performed using training-only validation
-- the holdout test set is reserved for final evaluation
-
-This provides a more reliable comparison between the three regression approaches.
+- `charges` is excluded from the feature matrix.
+- preprocessing stays inside scikit-learn pipelines.
+- polynomial degree selection uses training-only validation.
+- Decision Tree tuning uses training-only validation.
+- the final holdout test set is reserved for final evaluation.
 
 ---
 
-# 🔁 Reproducibility
-
-The project uses reproducible settings wherever applicable:
-
-```python
-random_state=42
-```
-
-This is used for the train/test split, Decision Tree workflow, and shuffled cross-validation.
-
-The saved `.pkl` files contain the trained preprocessing + regression pipelines so predictions can be reproduced directly from raw model inputs.
-
----
-
-# 📁 Project Structure
+## 📁 Project Structure
 
 ```text
 medical-insurance-charges-regression/
-│
 ├── app.py
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
 ├── LICENSE
-│
+├── .streamlit/
+│   └── config.toml
 ├── data/
-│   ├── raw/
-│   │   └── insurance.csv
-│   └── processed/
-│       └── insurance_cleaned.csv
-│
+│   ├── raw/insurance.csv
+│   └── processed/insurance_cleaned.csv
 ├── notebooks/
 │   └── insurance_model_training.ipynb
-│
 ├── src/
 │   ├── preprocessing.py
 │   ├── train_models.py
 │   ├── evaluate_models.py
 │   └── utils.py
-│
 ├── models/
 │   ├── linear_regression.pkl
 │   ├── polynomial_regression.pkl
 │   └── decision_tree_regression.pkl
-│
 ├── reports/
 │   ├── model_comparison.csv
 │   ├── model_diagnostics.csv
@@ -314,105 +230,37 @@ medical-insurance-charges-regression/
 │   ├── question_coverage_checklist.csv
 │   ├── project_report.md
 │   └── project_report.pdf
-│
 ├── images/
-│   ├── actual_vs_predicted.png
-│   ├── age_vs_charges.png
-│   ├── bmi_vs_charges.png
-│   ├── feature_importance.png
-│   ├── model_comparison.png
-│   └── smoker_vs_charges.png
-│
 └── docs/
-    ├── Insurance_Regression_Project_Questions.docx
-    ├── DEVELOPMENT_LOG.md
-    └── supporting project documentation
 ```
 
 ---
 
-# ✅ Assignment Coverage
+## ✅ Assignment Coverage
 
-All **17 project requirements** are covered.
+All **17 project requirements** are covered, including dataset structure, cleaning, categorical encoding, EDA, smoker analysis, leakage prevention, all three regression models, metric comparison, interpretation, loop-based training, professional folder structure, deep business analysis, complete three-model comparison, cross-validation, and hyperparameter tuning.
 
-The repository includes evidence for:
-
-1. Dataset structure and data types
-2. Data quality and cleaning
-3. Categorical encoding
-4. Numerical relationships and EDA
-5. Smoking and insurance charges
-6. Train-test split and leakage prevention
-7. Linear Regression
-8. Polynomial Regression
-9. Decision Tree Regression
-10. Model performance comparison
-11. Feature importance and interpretation
-12. Business use and limitations
-13. Loop-based model training
-14. Professional folder structure
-15. Deep business analysis
-16. Complete three-model comparison
-17. Cross-validation and hyperparameter tuning
-
-See:
-
-```text
-reports/question_coverage_checklist.csv
-```
-
-for the question-by-question audit.
+See `reports/question_coverage_checklist.csv` for the detailed audit.
 
 ---
 
-# 🖼️ Visual Outputs
-
-The project includes portfolio-ready visualizations such as:
-
-- Actual vs Predicted charges
-- Age vs Charges
-- BMI vs Charges
-- Smoker vs Charges
-- Model Comparison
-- Decision Tree Feature Importance
-
-These are stored in the `images/` directory.
-
----
-
-# 💾 Saved Model Artifacts
-
-All three trained model pipelines are saved:
-
-```text
-models/
-├── linear_regression.pkl
-├── polynomial_regression.pkl
-└── decision_tree_regression.pkl
-```
-
-This confirms the project trains, persists, and compares all three models rather than only reporting notebook outputs.
-
----
-
-# ▶️ Run Locally
+## ▶️ Run Locally
 
 ```bash
 git clone https://github.com/mightyalok00/medical-insurance-charges-regression.git
 cd medical-insurance-charges-regression
-
 python -m venv .venv
 ```
 
-### Windows
+Windows:
 
-```powershell
-.\.venv\Scripts\Activate.ps1
+```bash
+.venv\Scripts\activate
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-### Notebook
+Notebook:
 
 ```bash
 jupyter notebook notebooks/insurance_model_training.ipynb
@@ -420,42 +268,39 @@ jupyter notebook notebooks/insurance_model_training.ipynb
 
 ---
 
-# 📦 Main Deliverables
+## 🔧 Deployment Notes
 
-The repository includes:
+The app uses paths relative to `app.py`, so it does not depend on a machine-specific Windows path.
 
-- cleaned insurance dataset
-- executed Jupyter notebook
-- reusable preprocessing/training/evaluation code
-- three trained regression pipelines
-- cross-validation results
-- model diagnostics
-- coefficient reports
-- Decision Tree feature-importance report
-- predicted-cost segmentation
-- project report in Markdown and PDF
-- visualization assets
-- assignment coverage checklist
-- professional supporting documentation
-- interactive Streamlit application
+Deployment dependencies are constrained to compatible major-version ranges in `requirements.txt`, including Streamlit and Altair.
+
+If Streamlit Cloud still shows an older interface after a commit, wait for the redeploy and perform a hard refresh (`Ctrl + F5`). The current app should show the **model selector at the top of the left sidebar**.
 
 ---
 
-# 🧾 Final Conclusion
+## 📦 Saved Deliverables
 
-This project demonstrates a complete and reproducible regression workflow from raw data through model training, comparison, interpretation, persistence, and deployment.
+- three trained `.pkl` pipelines
+- executed Jupyter notebook
+- cleaned dataset
+- model comparison and cross-validation results
+- coefficient and feature-importance reports
+- predicted-cost segmentation output
+- Markdown and PDF project reports
+- visualization images
+- professional Streamlit dashboard
+- assignment coverage checklist
+- supporting documentation
 
-**Linear Regression** establishes a transparent baseline but leaves meaningful nonlinear structure unexplained. **Polynomial Regression** improves predictive performance by modeling nonlinear effects and interactions. **Decision Tree Regression** achieves the strongest saved holdout performance, producing the lowest MAE, MSE, and RMSE and the highest R² among the three trained models.
+---
 
-### Final model conclusion
+## 🧾 Conclusion
 
-For this dataset and evaluation setup:
+This project demonstrates a complete regression workflow from raw data through model evaluation and deployment.
 
-> **Decision Tree Regression is the strongest predictive model of the three based on the saved holdout metrics.**
+**Linear Regression** provides a transparent baseline. **Polynomial Regression** improves performance by capturing nonlinear effects and interactions. **Decision Tree Regression** achieves the strongest saved holdout performance, with the lowest error metrics and highest R² among the three models.
 
-However, the project does not treat test performance as the only consideration. A production insurance model would also require external validation, fairness assessment, calibration, monitoring, governance, legal review, actuarial review, and validation on newer data.
-
-The final portfolio therefore demonstrates more than model accuracy: it shows **leakage prevention, reproducibility, model comparison, interpretability, business reasoning, responsible limitations, and deployment through Streamlit**.
+For this dataset and evaluation setup, the tuned **Decision Tree Regression** is the strongest predictive model of the three. Model choice in a real production setting would still need to balance predictive accuracy with interpretability, stability, fairness, operational constraints, and validation on new data.
 
 ---
 
