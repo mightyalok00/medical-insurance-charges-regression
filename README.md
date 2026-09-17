@@ -1,16 +1,51 @@
 # 🏥 Medical Insurance Charges Regression
 
+![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-Regression-orange)
+![Streamlit](https://img.shields.io/badge/Streamlit-Deployed-red)
+![Machine Learning](https://img.shields.io/badge/Machine%20Learning-Regression-green)
+![Status](https://img.shields.io/badge/Portfolio-Ready-brightgreen)
+
 End-to-end machine learning portfolio project for predicting medical insurance charges with **Linear Regression**, **Polynomial Regression**, and **Decision Tree Regression**.
 
-The repository covers data cleaning, EDA, leakage-safe preprocessing, cross-validation, hyperparameter tuning, model comparison, interpretation, business analysis, saved model pipelines, reports, and an interactive Streamlit application.
+The repository demonstrates a complete data science workflow: data cleaning, exploratory data analysis, leakage-safe preprocessing, cross-validation, hyperparameter tuning, model comparison, interpretation, business analysis, model persistence, reporting, and deployment with Streamlit.
 
-> **Portfolio focus:** reproducible regression workflow, transparent model comparison, business interpretation, and deployment-ready project structure.
+> **Portfolio focus:** reproducible machine learning, transparent model comparison, business interpretation, deployment, and recruiter-friendly documentation.
 
 ## 🚀 Live Demo
 
 **Streamlit App:** https://medical-insurance-charges-regression.streamlit.app/
 
-**GitHub:** https://github.com/mightyalok00/medical-insurance-charges-regression
+**GitHub Repository:** https://github.com/mightyalok00/medical-insurance-charges-regression
+
+---
+
+## 👔 Recruiter Snapshot
+
+- Built and evaluated **3 regression models** using a leakage-safe scikit-learn workflow.
+- Cleaned the dataset from **1,338 to 1,337 records** by removing one exact duplicate; no missing values remained.
+- Used **5-fold cross-validation** and training-only model selection before final holdout evaluation.
+- Achieved **Test R² = 0.8972** and **Test RMSE = 4,345.88** with the tuned Decision Tree model.
+- Reduced RMSE by approximately **27% versus the Linear Regression baseline**.
+- Deployed an interactive **Streamlit dashboard** with model selection, three-model prediction comparison, business insights, filtering, and downloadable outputs.
+
+---
+
+## 🧰 Tech Stack
+
+| Area | Tools / Skills |
+|---|---|
+| Language | Python |
+| Data Analysis | pandas, NumPy |
+| Machine Learning | scikit-learn |
+| Models | Linear Regression, Polynomial Regression, Decision Tree Regression |
+| Validation | Train/Test Split, 5-Fold Cross-Validation, Hyperparameter Tuning |
+| Evaluation | MAE, MSE, RMSE, R² |
+| Visualization | Matplotlib, Altair |
+| Deployment | Streamlit |
+| Model Persistence | joblib |
+| Development | Jupyter Notebook, Git, GitHub |
+| ML Practices | Pipelines, One-Hot Encoding, Leakage Prevention, Reproducibility |
 
 ---
 
@@ -41,7 +76,7 @@ The project compares three regression approaches to show the trade-off between *
 | Cross-validation | **5-fold** |
 | Models trained | **3** |
 | Metrics | **MAE, MSE, RMSE, R²** |
-| Best saved holdout model | **Decision Tree Regression** |
+| Strongest saved holdout performer | **Decision Tree Regression** |
 | Reproducibility | `random_state=42` |
 
 The final test set is kept untouched during model selection and tuning. Preprocessing remains inside scikit-learn pipelines to reduce leakage risk.
@@ -60,18 +95,36 @@ All three models use the same final holdout split.
 
 Source: `reports/model_comparison.csv`
 
-### 🏆 Best model in this project
+### Model-selection conclusion
 
-Based on the saved holdout-test results, **Decision Tree Regression** performs best because it has the lowest MAE, MSE, and RMSE and the highest R² among the three models.
+For this dataset and saved holdout evaluation, **Decision Tree Regression produced the strongest predictive results** because it has the lowest MAE, MSE, and RMSE and the highest R² among the three models.
 
 Compared with Linear Regression:
 
 - Polynomial Regression reduces Test RMSE by about **22%**.
 - Decision Tree Regression reduces Test RMSE by about **27%**.
 
-This suggests that nonlinear relationships and feature interactions are important in this dataset.
+This suggests that nonlinear relationships and feature interactions are important in the dataset.
 
-> “Best” means best on this project’s saved holdout metrics. A production model would still need external validation, monitoring, fairness testing, domain review, and stability checks.
+> “Strongest” refers only to this project's saved holdout metrics. A production model would still require external validation, monitoring, fairness testing, domain review, and stability checks.
+
+---
+
+## 📈 Portfolio Visuals
+
+### Model comparison
+
+![Model comparison](images/model_comparison.png)
+
+### Actual vs predicted charges
+
+![Actual vs predicted charges](images/actual_vs_predicted.png)
+
+### Decision Tree feature importance
+
+![Feature importance](images/feature_importance.png)
+
+These visuals make the model performance and interpretation easy to review without opening the notebook first.
 
 ---
 
@@ -102,30 +155,20 @@ The root-level `app.py` provides a professional interactive dashboard with:
 - **Data Explorer**
 - **Project Files**
 
-### 🧠 Always-visible model selector
+### 🧠 Model selector
 
-The **left sidebar** now contains the prediction model selector, so it is visible immediately when the app opens.
-
-Available options:
+The left sidebar contains an always-visible prediction model selector with:
 
 - `Compare all models`
 - `Linear Regression`
 - `Polynomial Regression`
 - `Decision Tree Regression`
 
-The selection controls the **Prediction Lab** tab.
-
-When `Compare all models` is selected, the app shows predictions from every successfully loaded model in a comparison table and chart. When a single model is selected, the app displays that model’s prediction and descriptive cost band.
-
-The sidebar also shows:
-
-- how many of the three model artifacts loaded successfully
-- model-load diagnostics if any artifact fails
-- the best saved holdout model
+The selection controls the **Prediction Lab** tab. When `Compare all models` is selected, the app shows predictions from all successfully loaded models in a comparison table and chart. When a single model is selected, the app displays that model's prediction and descriptive cost band.
 
 ### 🎛️ Dataset filters
 
-The sidebar also includes filters for:
+The sidebar includes filters for:
 
 - 🎂 Age
 - ⚖️ BMI
@@ -134,7 +177,7 @@ The sidebar also includes filters for:
 - 🚬 Smoker status
 - 📍 Region
 
-The reset button now resets the dataset filters correctly.
+The filtered dataset updates dashboard metrics and visualizations, and users can download the current filtered data as CSV.
 
 ---
 
@@ -142,7 +185,7 @@ The reset button now resets the dataset filters correctly.
 
 - Smokers have substantially higher observed mean charges than non-smokers in this dataset.
 - Age and BMI show meaningful relationships with charges.
-- Nonlinear models outperform the simple linear baseline on the saved holdout set.
+- Nonlinear models outperform the simple Linear Regression baseline on the saved holdout set.
 - Predicted-cost quartiles support descriptive segmentation.
 - Region, sex, and number of children show smaller descriptive differences than smoking status in this sample.
 
@@ -184,13 +227,21 @@ Saved Models + Reports + Streamlit App
 
 ---
 
-## 🛡️ Leakage Prevention
+## 🛡️ Leakage Prevention & Reproducibility
 
 - `charges` is excluded from the feature matrix.
 - preprocessing stays inside scikit-learn pipelines.
+- categorical variables are handled with pipeline-based encoding.
 - polynomial degree selection uses training-only validation.
 - Decision Tree tuning uses training-only validation.
 - the final holdout test set is reserved for final evaluation.
+- `random_state=42` is used where applicable.
+
+---
+
+## 🔎 Skills Demonstrated / ATS Keywords
+
+**Python, pandas, NumPy, scikit-learn, Machine Learning, Data Science, Regression, Linear Regression, Polynomial Regression, Decision Tree Regression, Exploratory Data Analysis, EDA, Data Cleaning, Data Preprocessing, Feature Engineering, One-Hot Encoding, Train-Test Split, Cross-Validation, Hyperparameter Tuning, Model Evaluation, MAE, MSE, RMSE, R², Model Comparison, Feature Importance, Pipelines, Data Leakage Prevention, Reproducibility, Business Analysis, Model Interpretation, Streamlit, Jupyter Notebook, Git, GitHub, joblib, Deployment.**
 
 ---
 
@@ -244,6 +295,19 @@ See `reports/question_coverage_checklist.csv` for the detailed audit.
 
 ---
 
+## 💼 Resume-Ready Project Summary
+
+**Medical Insurance Charges Regression | Python, scikit-learn, Streamlit**
+
+- Built and compared Linear, Polynomial, and Decision Tree regression pipelines on **1,337 cleaned insurance records** using leakage-safe preprocessing and **5-fold cross-validation**.
+- Achieved **R² = 0.8972** and **RMSE = 4,345.88** with the tuned Decision Tree model, reducing RMSE by approximately **27% versus the Linear Regression baseline**.
+- Developed model interpretation, feature-importance analysis, business segmentation, and reproducible evaluation using **MAE, MSE, RMSE, and R²**.
+- Deployed an interactive **Streamlit** application for model selection, multi-model prediction comparison, dataset filtering, and business insights.
+
+A dedicated copy-ready version is available in `docs/RESUME_PROJECT_ENTRY.md`.
+
+---
+
 ## ▶️ Run Locally
 
 ```bash
@@ -265,16 +329,6 @@ Notebook:
 ```bash
 jupyter notebook notebooks/insurance_model_training.ipynb
 ```
-
----
-
-## 🔧 Deployment Notes
-
-The app uses paths relative to `app.py`, so it does not depend on a machine-specific Windows path.
-
-Deployment dependencies are constrained to compatible major-version ranges in `requirements.txt`, including Streamlit and Altair.
-
-If Streamlit Cloud still shows an older interface after a commit, wait for the redeploy and perform a hard refresh (`Ctrl + F5`). The current app should show the **model selector at the top of the left sidebar**.
 
 ---
 
