@@ -27,6 +27,7 @@ SEGMENTS_PATH = REPORTS_DIR / "predicted_cost_segments.csv"
 FEATURE_IMPORTANCE_PATH = REPORTS_DIR / "decision_tree_feature_importance.csv"
 REPORT_MD_PATH = REPORTS_DIR / "project_report.md"
 REPORT_PDF_PATH = REPORTS_DIR / "project_report.pdf"
+TREE_EXPLAINER_PATH = BASE_DIR / "images" / "decision_tree_regression_explained.svg"
 
 st.set_page_config(
     page_title="Medical Insurance ML Dashboard",
@@ -401,6 +402,17 @@ with insights_tab:
         st.markdown("#### Decision Tree feature importance")
         st.altair_chart(feature_importance_chart(importance), width="stretch")
         st.dataframe(importance.head(15), width="stretch", hide_index=True)
+
+    st.markdown("#### 🌳 Decision Tree branches and leaf nodes")
+    st.caption(
+        "A simplified educational view of how a regression tree can move through decision nodes, "
+        "Yes/No branches, and final leaf predictions. It does not reproduce every exact split in the trained model."
+    )
+    if TREE_EXPLAINER_PATH.exists():
+        st.markdown(TREE_EXPLAINER_PATH.read_text(encoding="utf-8"), unsafe_allow_html=True)
+    else:
+        st.info("Decision Tree explainer image is not available in the repository.")
+
     if not segments.empty:
         st.markdown("#### Predicted-cost segmentation")
         st.dataframe(segments, width="stretch", hide_index=True)
