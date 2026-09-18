@@ -124,6 +124,14 @@ This suggests that nonlinear relationships and feature interactions are importan
 
 ![Feature importance](images/feature_importance.png)
 
+### Decision Tree branches and leaves — visual explanation
+
+The diagram below explains the basic structure of a Decision Tree Regression model using **decision nodes**, **Yes/No branches**, and **leaf nodes** that output predicted insurance-charge ranges.
+
+![Decision Tree Regression branches and leaves](images/decision_tree_regression_explained.svg)
+
+> **Note:** This is a simplified educational visualization for the portfolio. It explains how branches and leaf nodes work and does not claim to reproduce every exact split of the trained Decision Tree model.
+
 These visuals make the model performance and interpretation easy to review without opening the notebook first.
 
 ---
@@ -141,6 +149,8 @@ A nonlinear extension of the linear baseline. It improves predictive performance
 ### Decision Tree Regression
 
 The strongest saved holdout performer. It naturally captures thresholds and interactions without manual polynomial expansion. The project uses tuning and cross-validation to control complexity.
+
+A dedicated branches-and-leaves explainer is included at `images/decision_tree_regression_explained.svg` and is also displayed inside the Streamlit **Drivers & Insights** tab.
 
 ---
 
@@ -282,6 +292,10 @@ medical-insurance-charges-regression/
 │   ├── project_report.md
 │   └── project_report.pdf
 ├── images/
+│   ├── decision_tree_regression_explained.svg
+│   ├── model_comparison.png
+│   ├── actual_vs_predicted.png
+│   └── feature_importance.png
 └── docs/
 ```
 
