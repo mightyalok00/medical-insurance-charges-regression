@@ -12,6 +12,14 @@ The repository demonstrates a complete data science workflow: data cleaning, exp
 
 > **Portfolio focus:** reproducible machine learning, transparent model comparison, business interpretation, deployment, and recruiter-friendly documentation.
 
+## ⭐ Why this repository is useful
+
+- Reproducible comparison of Linear, Polynomial, and Decision Tree regression.
+- Leakage-safe pipelines, cross-validation, holdout evaluation, and model interpretation.
+- Public Streamlit demo backed by saved model artifacts.
+
+**⭐ If this project helps your learning or work, consider starring the repository.**
+
 ## 🚀 Live Demo
 
 **Streamlit App:** https://medical-insurance-charges-regression.streamlit.app/
